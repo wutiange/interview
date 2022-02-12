@@ -17,9 +17,13 @@ const Table = (props) => {
 
     const handleChildren = useCallback(() => {
         const newChildren = Array.isArray(children) ? children : [children];
+        // 保存渲染的函数，也就是自定义 cell 属性
         let renders = [];
+        // 保存每一列的标题
         let actualTiles = [];
+        // 保存属性值，是一个数组
         let attrs = [];
+        // 保存唯一字段的属性名
         let uniqueIdAttr = "";
         newChildren.forEach((children, index) => {
             // 读取孩子的 props 属性
@@ -30,11 +34,12 @@ const Table = (props) => {
             let attr = dataIndex ? dataIndex : '';
             attr = /\w+.\w+/.test(attr) ? attr.split('.') : [attr];
             attrs.push(attr);
+            // 如果设置了唯一值，那么就保存起来，这个值有且只有一个
             if (!uniqueIdAttr && htmlTitle === "Unique Id") {
                 uniqueIdAttr = attr;
             }
-            renders[index] = null;
-            renders[index] = cell ? cell : renders[index];
+            // 如果是渲染函数，那么直接赋值
+            renders[index] = cell;
         });
         return {
             renders,
@@ -58,7 +63,9 @@ const Table = (props) => {
                     return (
                         <tr key={getValByAttrArr(data, uniqueIdAttr)} className={'tr-scope'}>
                             {renders.map((render, index) => {
+                                // 先拿到对应属性的值
                                 const attrVal = getValByAttrArr(data, attrs[index]);
+                                // 如果 render 存在值，那么就使用 render ，否则直接填写内容
                                 const content = render ? render(attrVal, index, data) : attrVal;
                                 return (
                                     <td
